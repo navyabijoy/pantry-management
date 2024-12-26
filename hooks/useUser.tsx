@@ -77,7 +77,7 @@ export const MyUserContextProvider = (props: Props) => {
 // create the hook
 export const useMyUserContext = () => {
     const context = useContext(MyUserContext);
-    if (context === undefined) { // tyring to use hook outside the context
+    if (context === undefined) { 
         throw new Error('useMyUserContext must be used within a MyUserContextProvider');
     }
     return context;
