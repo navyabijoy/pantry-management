@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSessionContext, useUser as useSupaUser } from "@supabase/auth-helpers-react";
+import { User } from '@supabase/supabase-js';
 
 interface Props {
     children: React.ReactNode;
@@ -16,6 +17,7 @@ export interface PantryItem {
 }
 
 interface MyUserContextType {
+    user: User | null;  // Add this
     accessToken: string | null;
     pantryItems: PantryItem[];
     isLoading: boolean;
@@ -24,7 +26,11 @@ interface MyUserContextType {
 const MyUserContext = createContext<MyUserContextType | undefined>(undefined);
 
 export const MyUserContextProvider = (props: Props) => {
-    const { session, isLoading: isLoadingUser, supabaseClient: supabase } = useSessionContext();
+    const { 
+        session, 
+        isLoading: isLoadingUser, 
+        supabaseClient: supabase 
+    } = useSessionContext();
     const user = useSupaUser();
     const accessToken = session?.access_token ?? null;
 
@@ -63,6 +69,7 @@ export const MyUserContextProvider = (props: Props) => {
     }, [user, isLoadingUser]);
 
     const value: MyUserContextType = {
+        user,  // Add this
         accessToken,
         pantryItems,
         isLoading: isLoadingUser || isLoadingData,
@@ -74,7 +81,7 @@ export const MyUserContextProvider = (props: Props) => {
         </MyUserContext.Provider>
     );
 };
-// create the hook
+
 export const useMyUserContext = () => {
     const context = useContext(MyUserContext);
     if (context === undefined) { 
@@ -82,4 +89,3 @@ export const useMyUserContext = () => {
     }
     return context;
 };
-

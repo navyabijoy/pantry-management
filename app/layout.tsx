@@ -4,6 +4,7 @@ import "./globals.css";
 import SupabaseProvider from "@/providers/SupabaseProvider";
 import UserProvider from "@/providers/UserProvider";
 import { Providers } from "./providers";
+import ModalProvider from "@/providers/ModalProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       >
         <SupabaseProvider>
           <UserProvider>
+            <ModalProvider />
             <Providers> 
               {children}
             </Providers>
