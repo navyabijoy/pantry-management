@@ -62,6 +62,14 @@ export default function Header() {
         {user ? (
           <div className="sm:flex sm:gap-4">
             <button 
+              onClick={() => {
+                router.push('/dashboard');
+              }}
+              className="rounded-md px-5 py-2.5 text-sm font-medium text-customYellow hover:text-opacity-70"
+            >
+              Dashboard
+            </button>
+            <button 
               onClick={handleLogout}
               disabled={isLoading}
               className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-customYellow"
