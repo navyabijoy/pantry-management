@@ -8,10 +8,8 @@ type UserContextType = {
   setUser: (user: User | null) => void;
 };
 
-// Create the context
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Create the hook
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -20,7 +18,6 @@ export const useUser = () => {
   return context;
 };
 
-// Create the provider component
 export default function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
