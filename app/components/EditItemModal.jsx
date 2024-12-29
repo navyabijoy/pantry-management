@@ -1,4 +1,3 @@
-// client/app/components/EditItemModal.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Input,
@@ -140,7 +139,6 @@ export function EditItemModal({ open, setOpen, itemData, refreshItems }) {
             </Select>
           </div>
         </div>
-        {/* Add more fields as necessary */}
       </DialogBody>
       <DialogFooter>
         <Button
