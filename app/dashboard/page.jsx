@@ -157,6 +157,7 @@ export default function Dashboard() {
           .remove([filePath]);
 
         if (storageError) throw storageError;
+        toast.success('Item deleted successfully');
       }
 
       const { error } = await supabase
