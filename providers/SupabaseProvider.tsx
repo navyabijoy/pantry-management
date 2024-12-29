@@ -1,26 +1,47 @@
-"use client"
+"use client";
 
-import { Database } from "@/types_db";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { useState } from "react";
+import { createBrowserClient } from '@supabase/ssr';
+import { useRouter } from 'next/navigation';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { Database } from '@/types_db';
 
-interface SupabaseProviderProps {
-    children: React.ReactNode;
-};
+const SupabaseContext = createContext<any>(null);
 
-const SupabaseProvider: React.FC<SupabaseProviderProps> = ({
-    children,
-}) => {
-    const [supabaseClient] = useState(()=>
-    createClientComponentClient<Database>()
-    );
+export default function SupabaseProvider({ 
+    children 
+}: { 
+    children: React.ReactNode 
+}) {
+    const [supabase] = useState(() => createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    ));
+    const router = useRouter();
+
+    useEffect(() => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_OUT') {
+                // Only refresh the page on sign out
+                router.refresh();
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [supabase, router]);
 
     return (
-        <SessionContextProvider supabaseClient={supabaseClient}>
+        <SupabaseContext.Provider value={{ supabase }}>
             {children}
-        </SessionContextProvider>
-    )
+        </SupabaseContext.Provider>
+    );
 }
 
-export default SupabaseProvider
+export const useSupabase = () => {
+    const context = useContext(SupabaseContext);
+    if (context === null) {
+        throw new Error('useSupabase must be used within a SupabaseProvider');
+    }
+    return context;
+};

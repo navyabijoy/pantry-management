@@ -1,11 +1,12 @@
 import React from 'react'
+import AuthModal from './AuthModal'
 
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      <div className="absolute inset-0">
+      {/* <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[url('/pattern-light.svg')] opacity-10"></div>
-      </div>
+      </div> */}
 
       <div className="relative mx-auto max-w-screen-xl px-4 py-12 md:py-20 lg:py-32 min-h-[90vh] flex flex-col lg:flex-row items-center justify-center gap-8">
         <div className="w-full max-w-xl text-center lg:text-left lg:w-1/2">
@@ -20,7 +21,7 @@ export default function HeroSection() {
 
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a
-              href="#"
+              href= <AuthModal />
               className="inline-flex items-center justify-center rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Get Started Free
@@ -33,36 +34,20 @@ export default function HeroSection() {
               href="#"
               className="inline-flex items-center justify-center rounded-xl border border-accent px-8 py-3 text-sm font-semibold text-accent shadow-sm transition-all hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
-              Watch Demo
+              Learn More
               <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
               </svg>
             </a>
           </div>
-
-          <div className="mt-6 md:mt-8 flex items-center justify-center gap-x-6 lg:justify-start">
-            <div className="flex -space-x-2">
-              {[1,2,3,4].map((i) => (
-                <img
-                  key={i}
-                  className="inline-block h-6 w-6 md:h-8 md:w-8 rounded-full ring-2 ring-white"
-                  src={`https://randomuser.me/api/portraits/women/${i}.jpg`}
-                  alt=""
-                />
-              ))}
-            </div>
-            <div className="text-sm leading-6 text-gray-600">
-              <strong className="text-customYellow font-semibold">2000+</strong> happy users
-            </div>
-          </div>
         </div>
 
-        <div className="w-full lg:w-1/2">
+        <div className="w-full h-full lg:w-1/2">
           <div className="relative mt-8 lg:mt-0">
             <img
-              src="#"
+              src="/assets/app-screenshot.png"
               alt="App screenshot"
-              className="w-full rounded-xl shadow-2xl ring-1 ring-gray-900/10"
+              className="w-full h-full rounded-xl shadow-2xl ring-1 ring-gray-900/10"
               width={2432}
               height={1442}
             />

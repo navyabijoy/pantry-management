@@ -8,7 +8,14 @@ interface AuthModalStore {
 
 const useAuthModal = create<AuthModalStore>((set) => ({
     isOpen: false,
-    onOpen: () => set({ isOpen: true }),
-    onClose: () => set({ isOpen: false }),
+    onOpen: () => {
+        console.log('Opening modal from store');
+        set({ isOpen: true });
+    },
+    onClose: () => {
+        console.log('Closing modal from store');
+        set({ isOpen: false });
+    },
 }));
+
 export default useAuthModal;

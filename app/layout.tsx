@@ -5,7 +5,9 @@ import SupabaseProvider from "@/providers/SupabaseProvider";
 import UserProvider from "@/providers/UserProvider";
 import { Providers } from "./providers";
 import ModalProvider from "@/providers/ModalProvider";
-
+import Header from "./components/Header";
+import ToasterProvider from "@/providers/ToasterProvider";
+import AuthProvider from "@/providers/AuthProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,11 +33,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ToasterProvider />
         <SupabaseProvider>
           <UserProvider>
-            <ModalProvider />
-            <Providers> 
-              {children}
+            <Providers>
+              <ModalProvider />
+              <AuthProvider>
+                <Header />
+                {children}
+              </AuthProvider>
             </Providers>
           </UserProvider>
         </SupabaseProvider>
