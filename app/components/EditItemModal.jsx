@@ -144,7 +144,7 @@ export function EditItemModal({ open, setOpen, itemData, refreshItems }) {
       </DialogBody>
       <DialogFooter>
         <Button
-          className="ml-auto items-center bg-customYellow text-white font-bold rounded-lg p-2 w-20 h-10 text-center text-sm"
+          className="ml-auto items-center bg-customYellow text-white font-bold rounded-lg p-2 w-40 h-10 text-center text-sm"
           onClick={handleSubmit}
         >
           Save Changes

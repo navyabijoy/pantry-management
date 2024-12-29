@@ -4,21 +4,21 @@ import Modal from "./Modal";
 // import { Auth } from "@supabase/auth-ui-react";
 // import { ThemeSupa } from "@supabase/auth-ui-shared";
 import useAuthModal from "@/hooks/useAuthModal";
-import { useSupabase } from '@/providers/SupabaseProvider';
+// import { useSupabase } from '@/providers/SupabaseProvider';
 // import { Database } from "@/types_db";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { login, signup } from "@/app/login/actions";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 const AuthModal = () => {
-    const { supabase } = useSupabase();
+    // const { supabase } = useSupabase();
     const { onClose, isOpen } = useAuthModal();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [mode, setMode] = useState<'login' | 'signup'>('login');
-    const router = useRouter();
+    // const router = useRouter();
 
     const handleClose = useCallback(() => {
         onClose();
