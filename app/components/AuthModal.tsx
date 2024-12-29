@@ -46,7 +46,6 @@ const AuthModal = () => {
             handleClose();
             toast.success(mode === 'login' ? 'Logged in successfully!' : 'Account created successfully!');
             
-            // Let the server handle the redirect
             if (response?.url) {
                 window.location.href = response.url;
             }
