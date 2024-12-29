@@ -125,10 +125,8 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
         return;
       }
 
-      // Include the user ID in the form data
       const dataToInsert = { ...formData, user_id: user.id };
 
-      // Insert the new item into the 'pantry_items' table
       const { data, error } = await supabase
         .from('pantry_items')
         .insert([dataToInsert]);
@@ -144,7 +142,6 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
       setFormData({ item_name: '', quantity: '', unit: '', image_url: '' });
 
 
-      // Refresh the items list if the function is provided
       if (refreshItems) refreshItems();
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -156,7 +153,6 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
       <button
       onClick={() => setAddModalOpen(true)}
     >
-      {/* Add Item */}
     </button>
       <Dialog open={open} handler={setOpen}>
         <DialogHeader>
