@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { AddProductDialog } from '../components/AddItemModal';
+import { EditItemModal } from '../components/EditItemModal';
 import { Input } from "@material-tailwind/react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 
@@ -24,19 +25,49 @@ export default function Dashboard() {
     metric: '',
     image_url: ''
   });
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    setEditModalOpen(true);
+  };
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      console.log('Supabase client not initialized');
+      return;
+    }
 
     const checkSession = async () => {
       try {
+        // Add subscription to auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            console.log('Auth state changed:', event, session);
+            if (session) {
+              setUsername(session.user.email?.split('@')[0] || 'user');
+            } else if (event === 'SIGNED_OUT') {
+              router.replace('/');
+            }
+          }
+        );
+
+        // Initial session check
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
+        console.log('Initial session check:', session, sessionError);
+
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw sessionError;
+        }
         
         if (!session) {
+          console.log('No active session found');
           router.replace('/');
           return false;
         } else {
+          console.log('Session found:', session.user);
           setUsername(session.user.email?.split('@')[0] || 'user');
           return true;
         }
@@ -54,6 +85,7 @@ export default function Dashboard() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log('Fetched items:', data);
         setItems(data || []);
       } catch (error) {
         console.error('Error fetching items:', error.message);
@@ -66,6 +98,7 @@ export default function Dashboard() {
       setError(null);
       try {
         const sessionValid = await checkSession();
+        console.log('Session valid:', sessionValid);
         if (sessionValid) {
           await fetchItems();
         }
@@ -78,6 +111,12 @@ export default function Dashboard() {
     };
 
     loadInitialData();
+
+    // Cleanup subscription on unmount
+    return () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+      subscription.unsubscribe();
+    };
   }, [supabase, router]);
 
   const handleDelete = async (id, imageUrl) => {
@@ -110,13 +149,11 @@ export default function Dashboard() {
     }
   };
 
-  // In your Dashboard component
-// In your Dashboard component
-const filteredItems = items.filter((item) => {
-  const itemName = item.name || '';
-  const query = searchQuery || '';
-  return itemName.toLowerCase().includes(query.toLowerCase());
-});
+  const filteredItems = items.filter((item) => {
+    const itemName = item.name || '';
+    const query = searchQuery || '';
+    return itemName.toLowerCase().includes(query.toLowerCase());
+  });
 
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
@@ -132,8 +169,9 @@ const filteredItems = items.filter((item) => {
   
 
   return (
+    
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl mb-3 font-bold">Welcome,</h1>
+      <h1 className="text-2xl mb-3 font-bold">Welcome, {username}</h1>
       <p className=" text-sm text-gray-600 mb-6">
         Track your pantry items, manage inventory, and never run out of essentials.
       </p>
@@ -207,7 +245,7 @@ const filteredItems = items.filter((item) => {
                 <td className="px-6 py-4">
                   <div className="flex gap-3">
                     <button
-                      onClick={() => handleEdit(item.id)}
+                      onClick={() => handleEdit(item)}
                       className="p-1 hover:bg-gray-100 rounded"
                     >
                       <PencilIcon className="h-5 w-5 text-gray-600" />
@@ -225,6 +263,24 @@ const filteredItems = items.filter((item) => {
           </tbody>
         </table>
       </div>
+
+      <EditItemModal
+        open={editModalOpen}
+        setOpen={setEditModalOpen}
+        itemData={selectedItem}
+        refreshItems={async () => {
+          const { data, error } = await supabase
+            .from('pantry_items')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (error) {
+            console.error('Error refreshing items:', error);
+            return;
+          }
+          setItems(data || []);
+        }}
+      />
 
       {/* Generate Recipe Button */}
       <div className="flex justify-center mt-6">
