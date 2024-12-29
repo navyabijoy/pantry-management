@@ -47,12 +47,10 @@ export const MyUserContextProvider = ({ children }) => {
                     setIsLoadingData(false);
                 });
         } else if (!user && !isLoadingUser) {
-            // Reset pantry items when user logs out
             setPantryItems([]);
         }
     }, [user, isLoadingUser]);
 
-    // Add auth state change listener
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') {
