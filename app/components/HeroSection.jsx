@@ -1,12 +1,19 @@
+"use client"
 import React from 'react'
 import AuthModal from './AuthModal'
+import { useState } from 'react';
+import useAuthModal from '@/hooks/useAuthModal';
 
 export default function HeroSection() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const authModal = useAuthModal();
+
+  const handleLogin = () => {
+    authModal.onOpen();
+  };
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      {/* <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('/pattern-light.svg')] opacity-10"></div>
-      </div> */}
+      
 
       <div className="relative mx-auto max-w-screen-xl px-4 py-12 md:py-20 lg:py-32 min-h-[90vh] flex flex-col lg:flex-row items-center justify-center gap-8">
         <div className="w-full max-w-xl text-center lg:text-left lg:w-1/2">
@@ -21,8 +28,8 @@ export default function HeroSection() {
 
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a
-              href= <AuthModal />
-              className="inline-flex items-center justify-center rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              onClick={handleLogin}
+              className="inline-flex items-center justify-center rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer"
             >
               Get Started Free
               <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -30,15 +37,9 @@ export default function HeroSection() {
               </svg>
             </a>
 
-            <a
-              href="#"
-              className="inline-flex items-center justify-center rounded-xl border border-accent px-8 py-3 text-sm font-semibold text-accent shadow-sm transition-all hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            >
-              Learn More
-              <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
-            </a>
+            {isAuthModalOpen && (
+              <AuthModal open={isAuthModalOpen} setOpen={setIsAuthModalOpen} />
+            )}
           </div>
         </div>
 
