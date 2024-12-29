@@ -18,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({
     description,
     children
 }) => {
-    console.log('Modal render - isOpen:', isOpen); // Debug log
+    console.log('Modal render - isOpen:', isOpen); 
 
     return (
         <Dialog.Root
