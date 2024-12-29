@@ -38,7 +38,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('pantry_items')
         .select('*')
-        .ilike('item_name', `%${searchTerm}%`); // Use ilike for case-insensitive search
+        .ilike('item_name', `%${searchTerm}%`); 
 
       if (error) {
         console.error('Error fetching items:', error);
@@ -69,7 +69,6 @@ export default function Dashboard() {
 
     const checkSession = async () => {
       try {
-        // Add subscription to auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, session) => {
             console.log('Auth state changed:', event, session);
@@ -81,7 +80,6 @@ export default function Dashboard() {
           }
         );
 
-        // Initial session check
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         console.log('Initial session check:', session, sessionError);
 
@@ -141,7 +139,6 @@ export default function Dashboard() {
 
     loadInitialData();
 
-    // Cleanup subscription on unmount
     return () => {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
       subscription.unsubscribe();
@@ -227,7 +224,6 @@ export default function Dashboard() {
         const result = await response.json();
         console.log('Recipe data received:', result);
   
-        // Check for error in response
         if (result.error) {
           if (result.code === 429) {
             throw new Error("Too many requests. Please try again in a few minutes.");
@@ -235,7 +231,6 @@ export default function Dashboard() {
           throw new Error(result.error.message || "Failed to get recipes");
         }
   
-        // Make sure we have the expected data structure
         if (!result.choices || !result.choices[0] || !result.choices[0].message) {
           throw new Error("Invalid response format from recipe service");
         }
@@ -335,7 +330,6 @@ export default function Dashboard() {
         Track your pantry items, manage inventory, and never run out of essentials.
       </p>
 
-      {/* Search and Add Section */}
       <div className="flex gap-4 mb-6">
         <Input
           type="text"
@@ -375,7 +369,6 @@ export default function Dashboard() {
         
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
         <table className="w-full">
           <thead>
@@ -451,7 +444,6 @@ export default function Dashboard() {
         }}
       />
 
-      {/* Generate Recipe Button */}
       <div className="flex justify-center mt-6">
         <button 
           onClick={suggestRecipes}
