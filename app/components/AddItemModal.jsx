@@ -62,44 +62,42 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
+  const handleMetricChange = (value) => {
+    setFormData((prev) => ({ ...prev, unit: value }));
+  };
   
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setIsLoading(true);
-      try {
-        const preview = URL.createObjectURL(file);
-        setImagePreview(preview);
+        setIsLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'pantry_management');
 
-        const img = new Image();
-        img.src = preview;
-        img.onload = async () => {
-          if (model) {
-            const predictions = await model.classify(img);
-            setPredictions(predictions);
-            if (predictions[0].probability > 0.8) {
-              setFormData(prev => ({ ...prev, item_name: predictions[0].className }));
+            const response = await fetch('https://api.cloudinary.com/v1_1/dmjjyduak/image/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+            console.log('Cloudinary response:', data);
+
+            if (data.secure_url) {
+                const imageUrl = data.secure_url;
+                setFormData((prev) => ({ ...prev, image_url: imageUrl }));
+                setImagePreview(imageUrl);
+            } else {
+                console.error('Error uploading image:', data.error);
             }
-          }
-        };
-      } catch (error) {
-        console.error('Error processing image:', error);
-      } finally {
-        setIsLoading(false);
-      }
+        } catch (error) {
+            console.error('Error processing image:', error);
+        } finally {
+            setIsLoading(false);
+        }
     }
-  };
-
-  const handleCameraCapture = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
-      videoRef.current.play();
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-    }
-  };
+};
 
   const captureImage = async () => {
     const canvas = document.createElement('canvas');
@@ -118,36 +116,31 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
 
   const handleSubmit = async () => {
     try {
-      // Get the current user's ID
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.error('User not authenticated');
-        return;
-      }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error('User not authenticated');
+            return;
+        }
 
-      // Include the user ID in the form data
-      const dataToInsert = { ...formData, user_id: user.id };
+        const dataToInsert = { ...formData, user_id: user.id };
 
-      // Insert the new item into the 'pantry_items' table
-      const { data, error } = await supabase
-        .from('pantry_items')
-        .insert([dataToInsert]);
+        const { data, error } = await supabase
+            .from('pantry_items')
+            .insert([dataToInsert]);
 
-      if (error) {
-        console.error('Error adding item:', error);
-        return;
-      }
+        if (error) {
+            console.error('Error adding item:', error);
+            return;
+        }
 
-      console.log('Item added:', data);
-      setOpen(false);
-      setAddModalOpen(false);
-      setFormData({ item_name: '', quantity: '', unit: '', image_url: '' });
+        console.log('Item added:', data);
+        setOpen(false);
+        setAddModalOpen(false);
+        setFormData({ item_name: '', quantity: '', unit: '', image_url: '' });
 
-
-      // Refresh the items list if the function is provided
-      if (refreshItems) refreshItems();
+        if (refreshItems) refreshItems();
     } catch (error) {
-      console.error('Unexpected error:', error);
+        console.error('Unexpected error:', error);
     }
   };
 
@@ -156,7 +149,6 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
       <button
       onClick={() => setAddModalOpen(true)}
     >
-      {/* Add Item */}
     </button>
       <Dialog open={open} handler={setOpen}>
         <DialogHeader>
@@ -184,7 +176,7 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
               name="item_name"
               value={formData.item_name}
               onChange={handleInputChange}
-              className="placeholder:opacity-100 focus:!border-t-gray-900"
+              className="placeholder:opacity-100 focus:!border-t-gray-900 p-3"
               containerProps={{
                 className: "!min-w-full",
               }}
@@ -205,7 +197,7 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
                 name="quantity"
                 value={formData.quantity}
                 onChange={handleInputChange}
-                className="placeholder:opacity-100 focus:!border-t-gray-900"
+                className="placeholder:opacity-100 focus:!border-t-gray-900 p-3"
                 containerProps={{
                   className: "!min-w-full",
                 }}
@@ -224,13 +216,14 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
                     </Typography>
                     <Select
                       className="!w-full !border-[1.5px] !border-blue-gray-200/90 bg-white text-gray-800 ring-4 ring-transparent placeholder:text-gray-600 focus:!border-primary"
+                      onChange={handleMetricChange}
                       placeholder="Select Metric"
                       labelProps={{
                         className: "hidden",
                       }}
                     >
                       {METRIC_OPTIONS.map((option) => (
-                        <Option key={option.value} value={option.value} className="text-gray-600 font-normal text-sm cursor-pointer hover:bg-gray-100 ml-1 py-1">
+                        <Option key={option.value} value={option.value} className="text-gray-600 font-normal text-sm cursor-pointer hover:bg-gray-100 ml-1 py-1 p-3">
                           {option.label}
                         </Option>
                       ))}
@@ -250,14 +243,7 @@ export function AddItemModal({ open, setOpen, refreshItems }) {
                 <PhotoIcon className="h-4 w-4 text-black" />
                 Upload Image
               </Button>
-              <Button
-                size="sm"
-                className="flex items-center gap-2 text-black"
-                onClick={handleCameraCapture}
-              >
-                <CameraIcon className="h-4 w-4 text-black" />
-                Take Photo
-              </Button>
+              
             </div>
             <input
               type="file"
