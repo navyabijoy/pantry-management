@@ -72,7 +72,7 @@ export default function Dashboard() {
         // Add subscription to auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           (event, session) => {
-            console.log('Auth state changed:', event, session);
+            // console.log('Auth state changed:', event, session);
             if (session) {
               setUsername(session.user.email?.split('@')[0] || 'user');
             } else if (event === 'SIGNED_OUT') {

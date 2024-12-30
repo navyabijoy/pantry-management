@@ -1,9 +1,9 @@
 import React from 'react';
 import { 
   ShoppingCartIcon, 
-  ChartBarIcon, 
+  SparklesIcon, 
   CameraIcon,
-  BellAlertIcon 
+  HeartIcon 
 } from "@heroicons/react/24/outline";
 
 export default function Features() {
@@ -21,12 +21,12 @@ export default function Features() {
     {
       title: "Generate Recipes",
       description: "Generate recipes based on your pantry items and preferences.",
-      icon: <ChartBarIcon className="h-8 w-8 text-customYellow" />,
+      icon: <SparklesIcon className="h-8 w-8 text-customYellow" />,
     },
     {
       title: "User-Friendly Interface",
       description: "Easy to use and navigate, with a clean and intuitive design.",
-      icon: <BellAlertIcon className="h-8 w-8 text-customYellow" />,
+      icon: <HeartIcon className="h-8 w-8 text-customYellow" />,
     },
   ];
 
