@@ -1,4 +1,3 @@
-// app/api/recipes/route.js
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -45,7 +44,6 @@ export async function POST(request) {
 
     const data = await response.json();
 
-    // Handle rate limiting explicitly
     if (response.status === 429) {
       console.error('Rate limit exceeded');
       return NextResponse.json(
@@ -57,7 +55,6 @@ export async function POST(request) {
       );
     }
 
-    // Handle other non-200 responses
     if (!response.ok) {
       console.error('OpenRouter API error:', {
         status: response.status,

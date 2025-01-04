@@ -45,7 +45,7 @@ export default function Header() {
     authModal.onOpen();
   };
 
-  // Show nothing while checking auth state
+  // shows nothing while checking auth state
   if (isLoading) {
     return null;
   }
