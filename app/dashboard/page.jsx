@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/providers/SupabaseProvider';
-import { AddItemModal } from '../components/AddItemModal';
+import { AddItemSidebar } from '../components/AddItemSidebar';
 import { EditItemModal } from '../components/EditItemModal';
 import { Input } from "@material-tailwind/react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
@@ -356,7 +356,7 @@ export default function Dashboard() {
     >
       Add Item
     </button>
-         <AddItemModal
+         <AddItemSidebar
           open={addModalOpen}
           setOpen={setAddModalOpen}
           refreshItems={async () => {

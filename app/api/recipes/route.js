@@ -27,7 +27,7 @@ export async function POST(request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "qwen/qwen-2-7b-instruct:free",
+        model: "meta-llama/llama-3.2-3b-instruct:free",
         messages: [
           {
             role: "user",
