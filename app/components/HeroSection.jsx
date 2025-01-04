@@ -29,7 +29,7 @@ export default function HeroSection() {
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a
               onClick={handleLogin}
-              className="inline-flex items-center justify-center rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer"
+              className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-gray-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer"
             >
               Get Started Free
               <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

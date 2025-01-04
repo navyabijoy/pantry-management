@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { AddItemSidebar } from '../components/AddItemSidebar';
-import { EditItemModal } from '../components/EditItemModal';
+import { EditItemSidebar } from '../components/EditItemSidebar';
 import { Input } from "@material-tailwind/react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { toast } from 'react-hot-toast';
@@ -426,7 +426,7 @@ export default function Dashboard() {
         </table>
       </div>
 
-      <EditItemModal
+      <EditItemSidebar
         open={editModalOpen}
         setOpen={setEditModalOpen}
         itemData={selectedItem}
@@ -456,7 +456,7 @@ export default function Dashboard() {
       <h2 className="text-2xl font-bold mb-4">Recipe Suggestions</h2>
       <button
         onClick={() => setShowRecipes(!showRecipes)}
-        className="ml-auto bg-red-500 text-white font-bold rounded-lg p-2 mb-4"
+        className="ml-auto flex flex-wrap  text-customYellow/80 text-white font-bold rounded-lg p-2 mb-4 hover:underline"
       >
         {showRecipes ? 'Close Recipes' : 'Show Recipes'}
       </button>
