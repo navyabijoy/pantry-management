@@ -1,157 +1,77 @@
-// "use client";
-
-// import Modal from "./Modal";
-// // import { Auth } from "@supabase/auth-ui-react";
-// // import { ThemeSupa } from "@supabase/auth-ui-shared";
-// import useAuthModal from "@/hooks/useAuthModal";
-// // import { useSupabase } from '@/providers/SupabaseProvider';
-// // import { Database } from "@/types_db";
-// import { useCallback, useState } from "react";
-// import { login, signup } from "@/app/login/actions";
-// // import { useRouter } from "next/navigation";
-// import { toast } from "react-hot-toast";
-
-// const AuthModal = () => {
-//     // const { supabase } = useSupabase();
-//     const { onClose, isOpen } = useAuthModal();
-//     const [email, setEmail] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [mode, setMode] = useState<'login' | 'signup'>('login');
-//     // const router = useRouter();
-
-//     const handleClose = useCallback(() => {
-//         onClose();
-//     }, [onClose]);
-
-//     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//         e.preventDefault();
-//         setIsLoading(true);
-        
-//         const formData = new FormData(e.currentTarget);
-        
-//         try {
-//             let response;
-//             if (mode === 'login') {
-//                 response = await login(formData);
-//             } else {
-//                 response = await signup(formData);
-//             }
-
-//             if (response?.error) {
-//                 toast.error(response.error);
-//                 return;
-//             }
-
-//             handleClose();
-//             toast.success(mode === 'login' ? 'Logged in successfully!' : 'Account created successfully!');
-            
-<<<<<<< HEAD
-//             // Let the server handle the redirect
-//             if (response?.url) {
-//                 window.location.href = response.url;
-//             }
-//         } catch (error: any) {
-//             console.error('Auth error:', error);
-//             toast.error(error?.message || 'Authentication failed');
-//         } finally {
-//             setIsLoading(false);
-//         }
-//     };
-
-//     return (
-//         <Modal
-//             title="Welcome"
-//             description={mode === 'login' ? "Login to your account" : "Create an account"}
-//             isOpen={isOpen}
-//             onChange={handleClose}
-//         >
-//             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-//                 <input
-//                     name="email"
-//                     type="email"
-//                     placeholder="Email"
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                     className="rounded-md border p-2"
-//                 />
-//                 <input
-//                     name="password"
-//                     type="password"
-//                     placeholder="Password"
-//                     value={password}
-//                     onChange={(e) => setPassword(e.target.value)}
-//                     className="rounded-md border p-2"
-//                 />
-//                 <button 
-//                     type="submit"
-//                     disabled={isLoading}
-//                     className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
-//                 >
-//                     {isLoading ? 'Loading...' : (mode === 'login' ? 'Login' : 'Sign Up')}
-//                 </button>
-//                 <button
-//                     type="button"
-//                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-//                     className="text-sm text-gray-600"
-//                 >
-//                     {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Login'}
-//                 </button>
-//             </form>
-//         </Modal>
-//     );
-// };
-
-// export default AuthModal;
 "use client";
-import Modal from "./Modal";
+
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createBrowserClient } from '@supabase/ssr';
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
+
+import Modal from "./Modal";
 import useAuthModal from "@/hooks/useAuthModal";
-import { useEffect } from "react";
-import { createBrowserClient } from '@supabase/ssr'
 import { Database } from "@/types_db";
+
 const AuthModal = () => {
+    // Create supabase client with error handling
     const supabase = createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
     );
+
     const router = useRouter();
     const { onClose, isOpen } = useAuthModal();
+
     useEffect(() => {
+        let isMounted = true; // Add mounted check to prevent memory leaks
+
         const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                router.refresh(); 
-                onClose();
-=======
-            if (response?.url) {
-                window.location.href = response.url;
->>>>>>> c664f9439fe39a743c99f5e5e8bc10f77d3c9018
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Session check error:', error.message);
+                    return;
+                }
+
+                if (session && isMounted) {
+                    router.refresh();
+                    onClose();
+                }
+            } catch (err) {
+                console.error('Session check failed:', err);
             }
         };
-        
+
+        // Initial session check
         checkSession();
+
+        // Set up auth state change listener
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((event) => {
-            if (event === 'SIGNED_IN') {
-                router.refresh(); 
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && isMounted) {
+                router.refresh();
                 onClose();
             }
         });
+
+        // Cleanup function
         return () => {
+            isMounted = false;
             subscription.unsubscribe();
         };
     }, [supabase, router, onClose]);
+
     const onChange = (open: boolean) => {
         if (!open) {
             onClose();
         }
     };
-    
-      
+
+    // Don't render if not open
+    if (!isOpen) {
+        return null;
+    }
+
     return (
         <Modal
             title="Welcome back"
@@ -174,6 +94,7 @@ const AuthModal = () => {
                         },
                     },
                 }}
+                redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined}
             />
         </Modal>
     );
