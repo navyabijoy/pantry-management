@@ -47,7 +47,7 @@ const AuthModal = () => {
         // Set up auth state change listener
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((event, session) => {
+        } = supabase.auth.onAuthStateChange((event) => {
             if (event === 'SIGNED_IN' && isMounted) {
                 router.refresh();
                 onClose();
