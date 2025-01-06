@@ -1,8 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as mobilenet from '@tensorflow-models/mobilenet';
-import useAuthModal from '@/hooks/useAuthModal';
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import React, { useState, useRef } from 'react';
+import { XMarkIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -29,13 +26,12 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
     unit: '',
     image_url: ''
   });
-  const [model, setModel] = useState(null);
   const { supabase } = useSupabase();
   const [imagePreview, setImagePreview] = useState(null);
   const [predictions, setPredictions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
-  const videoRef = useRef(null);
+
 
   const METRIC_OPTIONS = [
     { label: "Grams (g)", value: "grams" },
@@ -49,28 +45,15 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
     { label: "Dozen", value: "dozen" },
     { label: "Units", value: "units" },
   ];
+  
 
-  useEffect(() => {
-    const loadModel = async () => {
-      try {
-        const loadedModel = await mobilenet.load();
-        setModel(loadedModel);
-      } catch (error) {
-        console.error('Failed to load MobileNet model:', error);
-      }
-    };
-    loadModel();
-  }, []);
-
-  const handleInputChange = (e) => {
+const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleMetricChange = (value) => {
     setFormData((prev) => ({ ...prev, unit: value }));
   };
-
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -81,11 +64,9 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      // Use the existing pantry_items folder
       const fileExt = file.name.split('.').pop();
       const fileName = `pantry_items/${user.id}-${Date.now()}.${fileExt}`;
 
-      // Upload the file
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('pantry-images')
         .upload(fileName, file, {
@@ -97,32 +78,17 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
         throw new Error(uploadError.message);
       }
 
-      // Get the public URL using the full path
       const { data: urlData } = await supabase.storage
         .from('pantry-images')
-        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365);
 
       if (!urlData?.signedUrl) {
         throw new Error('Failed to generate image URL');
       }
 
       const imageUrl = urlData.signedUrl;
-      console.log('Generated URL:', imageUrl); // For debugging
-
-      // Update form and preview
       setFormData((prev) => ({ ...prev, image_url: imageUrl }));
       setImagePreview(imageUrl);
-
-      // Handle image classification if model is available
-      if (model && imageUrl) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = imageUrl;
-        img.onload = async () => {
-          const predictions = await model.classify(img);
-          setPredictions(predictions);
-        };
-      }
 
       toast.success('Image uploaded successfully');
 
@@ -132,31 +98,25 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
     } finally {
       setIsLoading(false);
     }
-};
-
-
-  const captureImage = async () => {
-    if (!videoRef.current) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      
-      const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
-      await handleImageUpload({ target: { files: [file] } });
-      
-      const stream = videoRef.current.srcObject;
-      if (stream instanceof MediaStream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    }, 'image/jpeg');
   };
 
-  const handleSubmit = async () => {
+    const handleSubmit = async () => {
+    // Basic validation
+    if (!formData.item_name.trim()) {
+      toast.error('Please enter an item name');
+      return;
+    }
+    
+    if (!formData.quantity.trim()) {
+      toast.error('Please enter a quantity');
+      return;
+    }
+    
+    if (!formData.unit) {
+      toast.error('Please select a unit of measurement');
+      return;
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -164,7 +124,11 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
         return;
       }
 
-      const dataToInsert = { ...formData, user_id: user.id };
+      const dataToInsert = { 
+        ...formData, 
+        user_id: user.id,
+        quantity: parseFloat(formData.quantity) // Ensure quantity is a number
+      };
 
       const { data, error } = await supabase
         .from('pantry_items')
@@ -186,7 +150,7 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
       console.error('Error adding item:', error);
       toast.error('Error adding item: ' + error.message);
     }
-};
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -209,7 +173,7 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
               onChange={handleInputChange}
             />
           </div>
-
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Quantity</label>
@@ -261,36 +225,18 @@ export function AddItemSidebar({ open, setOpen, refreshItems }) {
               onChange={handleImageUpload}
             />
 
-            <video
-              ref={videoRef}
-              className={`w-full ${!videoRef.current?.srcObject ? 'hidden' : ''}`}
+            
+{imagePreview && (
+          <div className="space-y-2">
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-full rounded-lg object-cover"
             />
-
-            {videoRef.current?.srcObject && (
-              <Button 
-                onClick={captureImage} 
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Processing...' : 'Capture'}
-              </Button>
-            )}
-
-            {imagePreview && (
-              <div className="space-y-2">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full rounded-lg object-cover"
-                />
-                {predictions.length > 0 && (
-                  <p className="text-sm">
-                    Detected: {predictions[0].className}
-                    ({Math.round(predictions[0].probability * 100)}% confidence)
-                  </p>
-                )}
-              </div>
-            )}
+            
+            
+          </div>
+        )}
           </div>
 
           <Button 
