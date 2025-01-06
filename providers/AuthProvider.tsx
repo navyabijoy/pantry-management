@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { useUser } from '@/providers/UserProvider';
+import { Session } from '@supabase/supabase-js';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const { supabase } = useSupabase();
@@ -27,7 +28,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+      } = supabase.auth.onAuthStateChange((
+        _event: 'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED' | 'USER_UPDATED',
+        session: Session | null
+      ) => {
       if (session) {
         setUser(session.user);
       } else {
