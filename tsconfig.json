@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hooks/useUser.js", "app/page.tsx", "app/layout.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "hooks/useUser.js", "app/page.jsx", "app/layout.jsx", "app/auth/callback/route.js", "app/auth/confirm/route.js", "app/login/actions.js", "app/error/page.jsx", "utils/supabase/middleware.js", "utils/supabase/server.js", "middleware.js", "store/index.js", "providers/UserProvider.jsx", "providers/ToasterProvider.jsx", "providers/SupabaseProvider.jsx", "providers/ModalProvider.jsx", "providers/AuthProvider.jsx", "lib/utils.js", "hooks/useAuthModal.jsx"],
   "exclude": ["node_modules"]
 }

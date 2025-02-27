@@ -1,4 +1,3 @@
-// utils/goTrueClient.js
 import { GoTrueClient } from '@supabase/gotrue-js';
 
 let instance;

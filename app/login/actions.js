@@ -3,12 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 
-export async function login(formData: FormData) {
+export async function login(formData) {
   const supabase = await createClient()
 
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+    email: formData.get('email'),
+    password: formData.get('password'),
   }
 
   const { error } = await supabase.auth.signInWithPassword(data)
@@ -21,12 +21,12 @@ export async function login(formData: FormData) {
   return { url: '/dashboard' };
 }
 
-export async function signup(formData: FormData) {
+export async function signup(formData) {
   const supabase = await createClient()
 
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+    email: formData.get('email'),
+    password: formData.get('password'),
   }
 
   const { error } = await supabase.auth.signUp(data)

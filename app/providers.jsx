@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit'
 
 const store = configureStore({
     reducer: {
-        pantry: (state = { pantryItems: [] }, action) => {
+        pantry: (state = [], action) => {
             if (action.type === 'SET_PANTRY_ITEMS') {
                 return { ...state, pantryItems: action.payload }
             }
@@ -13,6 +13,6 @@ const store = configureStore({
     }
 })
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({children}) {
     return <Provider store={store}>{children}</Provider>
 }

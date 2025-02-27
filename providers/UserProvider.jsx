@@ -1,14 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState } from 'react';
-import { User } from '@supabase/auth-helpers-nextjs';
 
-type UserContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
-};
-
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext(undefined);
 
 export const useUser = () => {
   const context = useContext(UserContext);
@@ -18,8 +12,8 @@ export const useUser = () => {
   return context;
 };
 
-export default function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export default function UserProvider({ children }) { // Destructure children from props
+  const [user, setUser] = useState(null);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
