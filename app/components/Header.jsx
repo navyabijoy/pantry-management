@@ -83,9 +83,9 @@ export default function Header() {
               onClick={handleLogin}
               className="rounded-md bg-customYellow px-5 py-2.5 text-sm font-medium text-white shadow"
             >
-              Login
+              Join
             </button>
-            <div className="hidden sm:flex">
+{/*             <div className="hidden sm:flex">
               <button 
                 onClick={() => {
                   handleLogin();
@@ -94,7 +94,7 @@ export default function Header() {
               >
                 Sign Up
               </button>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
